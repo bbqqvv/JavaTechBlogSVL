@@ -28,7 +28,9 @@ public class Helper {
         try {
             // Tạo thư mục nếu chưa tồn tại
             File file = new File(path);
-            file.getParentFile().mkdirs();
+            if (file.getParentFile() != null) {
+                file.getParentFile().mkdirs(); // Tạo thư mục cha nếu chưa tồn tại
+            }
 
             fos = new FileOutputStream(file);
             byte[] buffer = new byte[1024];
@@ -54,4 +56,5 @@ public class Helper {
         }
         return f;
     }
+
 }

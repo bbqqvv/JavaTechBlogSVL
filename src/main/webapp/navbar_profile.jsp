@@ -108,13 +108,15 @@
 <!-- POST Modal --><!-- POST Modal -->
 <!-- Form HTML -->
 <div class="modal fade" id="add-post-modal" tabindex="-1" aria-labelledby="addPostModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog"> <!-- Thay đổi kích thước modal nếu cần -->
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="addPostModalLabel">Provide Post Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <!-- Phần tử chứa thông báo được di chuyển lên trên cùng -->
+                <div id="message"></div>
                 <form id="add-post-form" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="category-select" class="form-label">Category</label>
@@ -152,12 +154,23 @@
                         <button type="button" class="btn btn-primary" onclick="submitForm()">Post</button>
                     </div>
                 </form>
-                <div id="message"></div>
             </div>
         </div>
     </div>
 </div>
 
+
+<style>
+    .modal-dialog {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    /* Tùy chỉnh thêm nếu cần */
+    .modal-content {
+        height: auto;
+    }
+</style>
 
 <script>
     document.getElementById('edit-button').addEventListener('click', function () {
@@ -167,36 +180,6 @@
 </script>
 
 <script>
-    $(document).ready(function () {
-        $("#add-post-form").on("submit", function (event) {
-            event.preventDefault();
-            console.log("Form submitted...");
-            let form = new FormData(this);
-
-            $.ajax({
-                url: "AddPostServlet",
-                type: 'POST',
-                data: form,
-                success: function (data) {
-                    console.log(data);
-                    if (data.trim() === 'done') {
-                        swal("Good job!", "Saved successfully", "success");
-                    } else {
-                        swal("Error!!", "Something went wrong, try again...", "error");
-                    }
-                },
-                error: function () {
-                    swal("Error!!", "Something went wrong, try again...", "error");
-                },
-                processData: false,
-                contentType: false
-            });
-        });
-
-        let allPostRef = $('.c-link')[0];
-        getPosts(0, allPostRef);
-    });
-
     function getPosts(catId, temp) {
         $("#loader").show();
         $("#post-container").hide();
@@ -238,14 +221,20 @@
             method: 'POST',
             body: formData
         })
-            .then(response => response.text())
+            .then(response => response.text()) // Chuyển đổi phản hồi thành văn bản
             .then(data => {
-                // Hiển thị thông báo thành công
-                document.getElementById('message').innerHTML = '<div class="alert alert-success" role="alert">' + data + '</div>';
+                // Kiểm tra nội dung phản hồi để hiển thị thông báo phù hợp
+                if (data === "Post added successfully!") {
+                    document.getElementById('message').innerHTML = '<div class="alert alert-success" role="alert">' + data + '</div>';
+                } else if (data === "Failed to add post.") {
+                    document.getElementById('message').innerHTML = '<div class="alert alert-danger" role="alert">' + data + '</div>';
+                } else {
+                    document.getElementById('message').innerHTML = '<div class="alert alert-info" role="alert">Unknown response: ' + data + '</div>';
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
-                // Hiển thị thông báo lỗi
+                // Hiển thị thông báo lỗi khi xảy ra lỗi trong quá trình gửi yêu cầu
                 document.getElementById('message').innerHTML = '<div class="alert alert-danger" role="alert">An error occurred.</div>';
             });
     }
