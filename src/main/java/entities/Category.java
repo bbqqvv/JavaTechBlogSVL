@@ -45,8 +45,4 @@ public class Category {
         this.description = description;
     }
 
-
-
-
-
 }

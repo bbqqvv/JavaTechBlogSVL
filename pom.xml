@@ -20,6 +20,11 @@
       <artifactId>gson</artifactId>
       <version>2.10.1</version> <!-- Thay đổi phiên bản nếu cần -->
     </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jstl</artifactId>
+      <version>1.2</version>
+    </dependency>
 
 
     <dependency>
@@ -28,6 +33,7 @@
       <version>6.0.0</version>
       <scope>provided</scope>
     </dependency>
+
 
     <dependency>
       <groupId>junit</groupId>

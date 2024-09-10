@@ -1,6 +1,7 @@
 package servlet;
 
 import dao.UserDao;
+import entities.Message;
 import entities.User;
 import helper.ConnectionProvider;
 import jakarta.servlet.ServletException;
@@ -16,32 +17,25 @@ import java.io.IOException;
 public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Lấy thông tin đăng nhập từ form
         String email = req.getParameter("email");
         String password = req.getParameter("password");
 
-        // Tạo đối tượng UserDao để truy vấn cơ sở dữ liệu
         UserDao dao = new UserDao(ConnectionProvider.getConnection());
+        User user = dao.getUserByEmailAndPassword(email, password);
 
-        // Gọi phương thức để lấy thông tin người dùng từ cơ sở dữ liệu
-        User u = dao.getUserByUsernameAndPassword(email, password);
+        HttpSession session = req.getSession();
 
-        if (u == null) {
-            // Đăng nhập thất bại, thông báo lỗi và chuyển hướng về lại trang đăng nhập
-            HttpSession session = req.getSession();
-            session.setAttribute("error", "Invalid email or password.");
-            resp.sendRedirect("login_page.jsp"); // Chuyển hướng về trang đăng nhập
-
-            // Ghi lại thông báo trong console khi đăng nhập thất bại
-            System.out.println("Login failed for email: " + email);
+        if (user == null) {
+            // Login failed
+            Message msg = new Message("Invalid email or password.", "danger", "alert-danger");
+            session.setAttribute("msg", msg);
+            resp.sendRedirect("login_page.jsp");
         } else {
-            // Đăng nhập thành công, lưu thông tin người dùng trong session và chuyển hướng tới trang chủ
-            HttpSession session = req.getSession();
-            session.setAttribute("currentUser", u);
-            resp.sendRedirect("profile.jsp"); // Chuyển hướng về trang chủ
-
-            // Ghi lại thông báo trong console khi đăng nhập thành công
-            System.out.println("Login successful for email: " + email);
+            // Login successful
+            session.setAttribute("currentUser", user);
+            Message msg = new Message("Login successful!", "success", "alert-success");
+            session.setAttribute("msg", msg);
+            resp.sendRedirect("profile.jsp");
         }
     }
 }

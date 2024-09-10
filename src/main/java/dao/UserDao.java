@@ -1,7 +1,6 @@
 package dao;
 
 import entities.User;
-import helper.ConnectionProvider;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDao {
-
     private Connection con;
 
     public UserDao(Connection con) {
@@ -18,10 +16,10 @@ public class UserDao {
 
     // Save user to the database
     public boolean saveUser(User user) {
-        boolean f = false;
-        String query = "insert into user(user_name,email,password,gender,about) values (?,?,?,?,?)";
+        boolean isSaved = false;
+        String query = "INSERT INTO user(user_name, email, password, gender, about) VALUES (?,?,?,?,?)";
 
-        try (PreparedStatement pstmt = this.con.prepareStatement(query)) {
+        try (PreparedStatement pstmt = con.prepareStatement(query)) {
             pstmt.setString(1, user.getUser_name());
             pstmt.setString(2, user.getEmail());
             pstmt.setString(3, user.getPassword());
@@ -29,58 +27,76 @@ public class UserDao {
             pstmt.setString(5, user.getAbout());
 
             pstmt.executeUpdate();
-            f = true;
+            isSaved = true;
         } catch (SQLException e) {
-            // Use a proper logging framework instead of printStackTrace
-            e.printStackTrace();  // Replace with logger.error("Error in saveUser", e);
+            e.printStackTrace(); // Replace with logging
         }
-        return f;
+
+        return isSaved;
     }
 
-    // Get user by email and password
-    public User getUserByUsernameAndPassword(String email, String password) {
+    // Retrieve user by email and password
+    public User getUserByEmailAndPassword(String email, String password) {
         User user = null;
-        String query = "select * from user where email=? and password=?";
+        String query = "SELECT * FROM user WHERE email=? AND password=?";
 
-        try (PreparedStatement pstmt = this.con.prepareStatement(query)) {
+        try (PreparedStatement pstmt = con.prepareStatement(query)) {
             pstmt.setString(1, email);
             pstmt.setString(2, password);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    user = new User(rs.getString("user_name"), rs.getString("email"),
-                            rs.getString("password"), rs.getString("gender"), rs.getString("about"), rs.getString("profile"));
+                    user = new User(
+                            rs.getInt("id"),
+                            rs.getString("user_name"),
+                            rs.getString("email"),
+                            rs.getString("password"),
+                            rs.getString("gender"),
+                            rs.getString("about"),
+                            rs.getString("profile")
+                    );
                 }
             }
         } catch (SQLException e) {
-            // Log the exception properly
-            e.printStackTrace();  // Replace with logger.error("Error in getUserByUsernameAndPassword", e);
+            e.printStackTrace(); // Replace with logging
         }
+
         return user;
     }
 
     // Update user profile
-    public static boolean updateUser(User user) {
-        boolean rowUpdated = false;
-        String sql = "UPDATE user SET user_name = ?, email = ?, gender = ?, about = ? , profile = ? WHERE id = ?";
+    public boolean updateUser(User user) {
+        boolean isUpdated = false;
+        String query = "UPDATE user SET user_name=?, email=?, password=?, gender=?, about=?, profile=? WHERE id=?";
 
-        try (Connection conn = ConnectionProvider.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = con.prepareStatement(query)) {
+            pstmt.setString(1, user.getUser_name());
+            pstmt.setString(2, user.getEmail());
+            pstmt.setString(3, user.getPassword());
+            pstmt.setString(4, user.getGender());
+            pstmt.setString(5, user.getAbout());
+            pstmt.setString(6, user.getProfile());
+            pstmt.setInt(7, user.getId()); // Đảm bảo rằng user.getId() trả về giá trị chính xác
 
-            stmt.setString(1, user.getUser_name());
-            stmt.setString(2, user.getEmail());
-            stmt.setString(3, user.getGender());
-            stmt.setString(4, user.getAbout());
-            stmt.setString(5, user.getProfile()); // Thêm profile
-            stmt.setInt(6, user.getId());  // Đúng chỉ số cho id
+            // Log query và tham số
+            System.out.println("SQL Query: " + query);
+            System.out.println("Parameters: " +
+                    "user_name=" + user.getUser_name() + ", " +
+                    "email=" + user.getEmail() + ", " +
+                    "password=" + user.getPassword() + ", " +
+                    "gender=" + user.getGender() + ", " +
+                    "about=" + user.getAbout() + ", " +
+                    "profile=" + user.getProfile() + ", " +
+                    "id=" + user.getId());
 
-
-            rowUpdated = stmt.executeUpdate() > 0;
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("Rows affected: " + rowsAffected); // Log số hàng bị ảnh hưởng
+            isUpdated = rowsAffected > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Thay thế bằng logging nếu cần
         }
 
-        return rowUpdated;
+        return isUpdated;
     }
 
 

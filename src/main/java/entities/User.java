@@ -14,6 +14,24 @@ public class User {
     private String profile;
     private Timestamp date;
 
+    public User(String user_name, String email, String password, String gender, String about, String profile) {
+        this.user_name = user_name;
+        this.email = email;
+        this.password = password;
+        this.gender = gender;
+        this.about = about;
+        this.profile = profile;
+    }
+
+    public User(int id, String user_name, String email, String password, String gender, String about, String profile) {
+        this.id = id;
+        this.user_name = user_name;
+        this.email = email;
+        this.password = password;
+        this.gender = gender;
+        this.about = about;
+        this.profile = profile;
+    }
 
     public User() {
     }
@@ -27,16 +45,6 @@ public class User {
         this.about = about;
         this.date = date;
     }
-
-    public User(String user_name, String email, String password, String gender, String about, String profile) {
-        this.user_name = user_name;
-        this.email = email;
-        this.password = password;
-        this.gender = gender;
-        this.about = about;
-        this.profile = profile;
-    }
-
 
 
     public int getId() {

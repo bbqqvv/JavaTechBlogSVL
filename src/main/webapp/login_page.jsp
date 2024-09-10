@@ -1,4 +1,4 @@
-<%@ page import="com.google.protobuf.Message" %>
+<%@ page import="entities.Message" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,12 +13,10 @@
         body {
             background-color: #f8f9fa;
         }
-
         .card {
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
         .card-header {
             background-color: #007bff;
             color: #ffffff;
@@ -26,31 +24,22 @@
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
         }
-
         .card-body {
             padding: 2rem;
         }
-
         .form-label {
             font-weight: 500;
         }
-
         .form-text {
             color: #6c757d;
         }
-
         .btn-primary {
             background-color: #007bff;
             border-color: #007bff;
         }
-
         .btn-primary:hover {
             background-color: #0056b3;
             border-color: #004085;
-        }
-
-        .form-check-label {
-            margin-left: 0.5rem;
         }
     </style>
 </head>
@@ -66,20 +55,16 @@
                         <h5><i class="fa-regular fa-user"></i> Login Here</h5>
                     </div>
 
-                    <%-- Kiểm tra và hiển thị thông báo nếu có --%>
+                    <!-- Check and display any alert messages -->
                     <%
-                        entities.Message m = (  entities.Message) session.getAttribute("msg");
-                        if (m != null) {
-                            String cssClass = (String) session.getAttribute("cssClass");
-                            String content = m.getContent(); // Assuming getContent() returns a String
+                        Message msg = (Message) session.getAttribute("msg");
+                        if (msg != null) {
                     %>
-                    <div class="alert <%= cssClass %>" role="alert">
-                        <%= content %>
+                    <div class="alert <%= msg.getCssClass() %>" role="alert">
+                        <%= msg.getContent() %>
                     </div>
                     <%
-                            // Xóa thông báo và lớp CSS sau khi hiển thị
                             session.removeAttribute("msg");
-                            session.removeAttribute("cssClass");
                         }
                     %>
 
